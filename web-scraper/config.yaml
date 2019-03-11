@@ -1,0 +1,27 @@
+news_sites:
+  impactolocal:
+    url: https://impactolocal.com.ar
+    queries:
+      homepage_article_links:
+        - .entry-title a
+      article_body: '.td-post-content'
+      article_title: '.td-post-title h1'
+  lavozzarate:
+    url: http://www.diariolavozdezarate.com
+    queries:
+      homepage_article_links:
+        - .item a
+        - .noticias a
+        - .noticiaSide a
+        - .mason a
+        - .noticiaDepo a
+        - .popular-posts a
+      article_body: '.single p'
+      article_title: '.single h1'
+  eluniversal:
+    url: http://www.eluniversal.com.mx
+    queries:
+      homepage_article_links:
+        - .field-content a
+      article_body: '.field-name-body'
+      article_title: '.pane-content h1'

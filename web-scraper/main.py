@@ -3,6 +3,8 @@ import logging
 import re
 from requests.exceptions import HTTPError
 from urllib3.exceptions import MaxRetryError
+import datetime
+import csv
 
 import news_page_objects as news
 from common import config
@@ -52,6 +54,26 @@ def _fetch_article(news_site_uid, host, link):
     return article
 
 
+def _save_articles(news_site_uid, articles):
+    now = datetime.datetime.now().strftime('%d_%m_%Y')
+    out_file_name = '{news_site_uid}_{datetime}_articles.csv'.format(
+        news_site_uid=news_site_uid, datetime=now)
+    csv_headers = list(filter(
+        lambda property: not property.startswith('_'),
+        dir(articles[0])))
+
+    with open(out_file_name, mode='w+') as file:
+        writer = csv.writer(file)
+        writer.writerow(csv_headers)
+
+        for article in articles:
+            try:
+                row = [str(getattr(article, prop)) for prop in csv_headers]
+                writer.writerow(row)
+            except Exception as e:
+                logger.error('ERROR fetching article: {}'.format(e))
+
+
 def _news_scraper(news_site_uid):
     host = config()['news_sites'][news_site_uid]['url']
     logger.info('Beginning scraper for {}'.format(host))
@@ -62,20 +84,27 @@ def _news_scraper(news_site_uid):
         article = _fetch_article(news_site_uid, host, link)
 
         if article:
-            logger.info('Article fetched: {}'.format(article.title))
+            logger.info('Article fetched!')
             articles.append(article)
+
+    _save_articles(news_site_uid, articles)
     print('Total de Links Encontrados: {}'.format(len(links)))
     print('Total de Articulos Encontrados: {}'.format(len(articles)))
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
     news_site_choices = list(config()['news_sites'].keys())
 
-    parser.add_argument('news_site',
-                        help='The news site that you want to scrape',
-                        type=str,
-                        choices=news_site_choices)
+    # # Genera CSV para el news_site ingresado por consola (primer argumento)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('news_site',
+    #                     help='The news site that you want to scrape',
+    #                     type=str,
+    #                     choices=news_site_choices)
 
-    args = parser.parse_args()
-    _news_scraper(args.news_site)
+    # args = parser.parse_args()
+    # _news_scraper(args.news_site)
+
+    # Genera un archivo CSV por cada news_site configurada en config.yaml
+    for news_site in news_site_choices:
+        _news_scraper(news_site)

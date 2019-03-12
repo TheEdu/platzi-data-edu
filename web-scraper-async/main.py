@@ -45,12 +45,13 @@ async def _news_scraper():
     async with aiohttp.ClientSession() as session:
         for news_site_uid in news_site_choices:
             tasks.append(_fetch_links(news_site_uid, session))
-        results = await asyncio.gather(*tasks)
+        home_pages = await asyncio.gather(*tasks)
 
-        for index in range(len(results)):
-            error = results[index][0]
-            links = results[index][1]
-            news_site_uid = results[index][2]
+        tasks = []
+        for index in range(len(home_pages)):
+            error = home_pages[index][0]
+            links = home_pages[index][1]
+            news_site_uid = home_pages[index][2]
 
             # Check Error
             if error == 0:
@@ -58,13 +59,12 @@ async def _news_scraper():
             else:
                 logger.error(error)
 
-            tasks = []
             for link in links:
                 tasks.append(_fetch_article(news_site_uid, link, session))
-            articles = await asyncio.gather(*tasks)
 
-            for article in articles:
-                print(article)
+        articles = await asyncio.gather(*tasks)
+        for article in articles:
+            print(article)
 
 
 if __name__ == '__main__':

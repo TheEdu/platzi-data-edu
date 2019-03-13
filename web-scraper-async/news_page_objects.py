@@ -4,7 +4,7 @@ import re
 from common import config
 
 # Regular expresion definitions
-is_well_former_link = re.compile(r'^https?://.+/.+$')
+is_well_former_link = re.compile(r'^https?://.+$')
 is_root_path = re.compile(r'^/.+$')
 
 
@@ -32,6 +32,10 @@ class NewsPage:
         for query_string in query_string_list:
             results = results + self._html.select(query_string)
         return results
+
+    @property
+    def url_csv(self):
+        return self._url
 
     async def visit(self, session):
         async with session.get(self._url) as response:

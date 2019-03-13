@@ -18,6 +18,13 @@ news_sites:
         - .popular-posts a
       article_body: '.single p'
       article_title: '.single h1'
+  enlacecritico:
+    url: http://www.enlacecritico.com/tag/impacto/
+    queries:
+      homepage_article_links:
+        - '#colorcontentwrap422 a'
+      article_body: '.entry p'
+      article_title: '.post h2'
   eluniversal:
     url: http://www.eluniversal.com.mx
     queries:

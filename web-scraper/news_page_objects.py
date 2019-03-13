@@ -8,7 +8,8 @@ class NewsPage:
         self._config = config()['news_sites'][news_site_uid]
         self._queries = self._config['queries']
         self._html = None
-        self._visit(url)
+        self._url = url
+        self._visit(self._url)
 
     def _select(self, query_string):
         return self._html.select(query_string)
@@ -19,6 +20,10 @@ class NewsPage:
             results = results + self._html.select(query_string)
         print(len(results))
         return results
+
+    @property
+    def url(self):
+        return self._url
 
     def _visit(self, url):
         response = requests.get(url)

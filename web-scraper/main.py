@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ws")
 
 # Regular expresion definitions
-is_well_former_link = re.compile(r'^https?://.+/.+$')
+is_well_former_link = re.compile(r'^https?://.+$')
 is_root_path = re.compile(r'^/.+$')
 
 

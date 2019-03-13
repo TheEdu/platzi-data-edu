@@ -58,7 +58,7 @@ class ArticlePage(NewsPage):
         self._url = _build_link(self._url, article_url)
 
     @property
-    def body(self):
+    def body_csv(self):
         results = self._select(self._queries['article_body'])
         text = ''
         for result in results:
@@ -66,6 +66,6 @@ class ArticlePage(NewsPage):
         return text
 
     @property
-    def title(self):
+    def title_csv(self):
         result = self._select(self._queries['article_title'])
         return result[0].text if len(result) else ''

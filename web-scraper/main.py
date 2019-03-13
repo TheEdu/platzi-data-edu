@@ -87,7 +87,8 @@ def _news_scraper(news_site_uid):
             logger.info('Article fetched!')
             articles.append(article)
 
-    _save_articles(news_site_uid, articles)
+    if articles:
+        _save_articles(news_site_uid, articles)
     print('Total de Links Encontrados: {}'.format(len(links)))
     print('Total de Articulos Encontrados: {}'.format(len(articles)))
 

@@ -2,6 +2,8 @@ import argparse
 from urllib.parse import urlparse
 import pandas as pd
 import hashlib
+import nltk
+from nltk.corpus import stopwords
 
 # Logger
 import logging
@@ -82,6 +84,23 @@ def _remove_unwanted_chars(df, replacements):
     return df
 
 
+def tokenize_column(df, column_name, stop_words):
+    return (df
+            .dropna()
+            .apply(lambda row: nltk.word_tokenize(row[column_name]), axis=1)
+            .apply(lambda tokens: list(filter(lambda token: token.isalpha(), tokens)))
+            .apply(lambda tokens: list(map(lambda token: token.lower(), tokens)))
+            .apply(lambda word_list: list(filter(lambda word: word not in stop_words, word_list)))
+            .apply(lambda valid_word_list: len(valid_word_list))
+            )
+
+
+def _tokenize_columns(df, columns, stop_words):
+    for column in columns:
+        df['n_token_' + column] = tokenize_column(df, column, stop_words)
+    return df
+
+
 def main(filename):
     _log('Starting cleaning process')
     df = _read_data(filename, 'ISO-8859-1')
@@ -90,13 +109,17 @@ def main(filename):
     df = _extract_host(df)
     df = _fill_missing_titles(df)
     df = _generate_uid_for_rows(df)
+
     replacements = {
         "\n": " ",
         "\r": " ",
     }
     df = _remove_unwanted_chars(df, replacements)
 
-    print(df[['body_csv', 'url_csv']])
+    stop_words = set(stopwords.words('spanish'))
+    df = _tokenize_columns(df, ['title_csv', 'body_csv'], stop_words)
+
+    print(df[['title_csv', 'n_token_title_csv', 'n_token_body_csv']])
     return df
 
 

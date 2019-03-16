@@ -84,7 +84,7 @@ def _remove_unwanted_chars(df, replacements):
     return df
 
 
-def tokenize_column(df, column_name, stop_words):
+def _tokenize_column(df, column_name, stop_words):
     return (df
             .dropna()
             .apply(lambda row: nltk.word_tokenize(row[column_name]), axis=1)
@@ -97,7 +97,7 @@ def tokenize_column(df, column_name, stop_words):
 
 def _tokenize_columns(df, columns, stop_words):
     for column in columns:
-        df['n_token_' + column] = tokenize_column(df, column, stop_words)
+        df['n_token_' + column] = _tokenize_column(df, column, stop_words)
     return df
 
 

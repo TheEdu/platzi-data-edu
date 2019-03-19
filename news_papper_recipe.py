@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 import pandas as pd
 import hashlib
 import nltk
+import re
 from nltk.corpus import stopwords
 
 # Logger
@@ -96,9 +97,31 @@ def _tokenize_column(df, column_name, stop_words):
 
 
 def _tokenize_columns(df, columns, stop_words):
+    _log('Tokenazing columns')
     for column in columns:
         df['n_token_' + column] = _tokenize_column(df, column, stop_words)
     return df
+
+
+def _remove_duplicate_entries(df, column_name):
+    _log('Removing Duplicate Entries')
+    df.drop_duplicates(subset=[column_name], keep='first', inplace=True)
+    return df
+
+
+def _drop_rows_with_missing_values(df):
+    _log('Dropping rows with missing values')
+    return df.dropna()
+
+
+def _remove_system_path(filename):
+    return re.search(r"[^\\/]+$", filename).group()
+
+
+def _save_data(df, filename):
+    clean_filename = 'clean_{}'.format(_remove_system_path(filename))
+    _log('Saving data at location: {}'.format(clean_filename))
+    df.to_csv(clean_filename, encoding='utf-8-sig')
 
 
 def main(filename):
@@ -118,6 +141,9 @@ def main(filename):
 
     stop_words = set(stopwords.words('spanish'))
     df = _tokenize_columns(df, ['title_csv', 'body_csv'], stop_words)
+    df = _remove_duplicate_entries(df, 'title_csv')
+    df = _drop_rows_with_missing_values(df)
+    _save_data(df, filename)
 
     print(df[['title_csv', 'n_token_title_csv', 'n_token_body_csv']])
     return df

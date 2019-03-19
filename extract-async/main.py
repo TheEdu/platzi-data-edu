@@ -45,15 +45,14 @@ async def _fetch_article(news_site_uid, link, session):
     return (error, article, news_site_uid)
 
 
-async def _news_scraper():
-    news_site_choices = list(config()['news_sites'].keys())
+async def _news_scraper(news_sites_selected):
     tasks = []
 
     logger.info('Beginning scraping')
     async with aiohttp.ClientSession() as session:
 
         logger.info('Fetching articles links...')
-        for news_site_uid in news_site_choices:
+        for news_site_uid in news_sites_selected:
             tasks.append(_fetch_links(news_site_uid, session))
         home_pages = await asyncio.gather(*tasks)
 
@@ -106,8 +105,21 @@ async def _news_scraper():
                         writer.writerow(r)
                     except Exception as e:
                         logger.error('ERROR writing article: {}'.format(e))
-    logger.info('Finishing scraping')
+    logger.info('Scraping Finished')
 
 if __name__ == '__main__':
+    news_site_choices = list(config()['news_sites'].keys())
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-l',
+                        '--names-list',
+                        nargs='+',
+                        help='The news sites list that you want to scrape',
+                        choices=news_site_choices,
+                        default=news_site_choices,)
+
+    news_sites_selected = parser.parse_args().names_list
+    print(news_sites_selected)
+
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(_news_scraper())
+    loop.run_until_complete(_news_scraper(news_sites_selected))

@@ -2,8 +2,10 @@ import argparse
 from urllib.parse import urlparse
 import pandas as pd
 import hashlib
-import nltk
 import re
+import nltk
+# nltk.download('punkt')
+# nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 # Logger

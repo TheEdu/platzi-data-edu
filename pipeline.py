@@ -3,7 +3,7 @@ import subprocess
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-news_sites_uids = ['impactolocal', 'lavozzarate']
+news_sites_uids = ['impactolocal']
 
 
 def _extract():
@@ -20,7 +20,7 @@ def _transform():
     for news_site_uid in news_sites_uids:
         dirty_data_filename = '{}_.csv'.format(news_site_uid)
         clean_data_filename = 'clean_{}'.format(dirty_data_filename)
-        subprocess.run(['python', 'main.py', dirty_data_filename], cwd='./transform')
+        subprocess.run(['python', 'news_papper_recipe.py', dirty_data_filename], cwd='./transform')
         subprocess.run(['rm', dirty_data_filename], cwd='./transform')
         subprocess.run(['mv', clean_data_filename, '../load/{}.csv'.format(news_site_uid)], cwd='./transform')
 
@@ -35,8 +35,8 @@ def _load():
 
 def _main():
     _extract()
-    _transform()
-    _load()
+    # _transform()
+    # _load()
 
 
 if __name__ == '__main__':
